@@ -1,0 +1,790 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Uploads - Bird Admin Dashboard</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+    :root {
+        --primary: #3b82f6;
+        --primary-dark: #2563eb;
+        --primary-light: #93c5fd;
+        --primary-very-light: #dbeafe;
+        --secondary: #1f2937;
+        --light-bg: #f8fafc;
+        --white: #ffffff;
+        --gray-50: #f9fafb;
+        --gray-100: #f3f4f6;
+        --gray-200: #e5e7eb;
+        --gray-300: #d1d5db;
+        --gray-400: #9ca3af;
+        --gray-500: #6b7280;
+        --gray-600: #4b5563;
+        --gray-700: #374151;
+        --gray-800: #1f2937;
+        --gray-900: #111827;
+        --shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+        --shadow-hover: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        --border-radius: 12px;
+        --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        --danger: #ef4444;
+        --danger-dark: #dc2626;
+        --warning: #f59e0b;
+        --warning-dark: #d97706;
+        --success: #10b981;
+        --success-dark: #059669;
+        --info: #3b82f6;
+        --info-dark: #2563eb;
+    }
+    
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    }
+    
+    body {
+        background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+        min-height: 100vh;
+    }
+    
+    .dashboard {
+        display: flex;
+        min-height: 100vh;
+    }
+    
+    /* Sidebar Styles - UNCHANGED */
+    .sidebar {
+        width: 250px;
+        background-color: var(--secondary);
+        color: var(--white);
+        padding: 20px 0;
+        transition: all 0.3s ease;
+        overflow-y: auto;
+        box-shadow: 2px 0 5px rgba(0,0,0,0.1);
+    }
+    
+    .sidebar-header {
+        padding: 0 20px 20px;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        text-align: center;
+    }
+    
+    .sidebar-header h2 {
+        color: var(--white);
+        margin-bottom: 10px;
+        font-weight: 600;
+        text-align: center;
+        width: 100%;
+        display: block;
+        line-height: 1.2;
+    }
+    
+    .nav-menu {
+        list-style: none;
+        padding: 20px;
+    }
+    
+    .nav-item {
+        margin-bottom: 15px;
+    }
+    
+    .nav-link {
+        color: var(--white);
+        text-decoration: none;
+        display: flex;
+        align-items: center;
+        padding: 10px;
+        border-radius: var(--border-radius);
+        transition: all 0.3s;
+        cursor: pointer;
+    }
+    
+    .nav-link:hover, .nav-link.active {
+        background-color: rgba(255, 255, 255, 0.1);
+        transform: translateX(5px);
+    }
+    
+    .nav-link i {
+        margin-right: 10px;
+        width: 20px;
+        text-align: center;
+    }
+    
+    .dropdown {
+        margin-top: 5px;
+    }
+    
+    .dropdown select {
+        width: 100%;
+        padding: 8px;
+        border-radius: var(--border-radius);
+        border: 1px solid #ddd;
+        background-color: var(--white);
+        margin-top: 5px;
+        cursor: pointer;
+    }
+    
+    /* Main Content Styles */
+    .main-content {
+        flex: 1;
+        padding: 32px;
+        background: transparent;
+    }
+    
+    .header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 32px;
+        background: var(--white);
+        padding: 24px 32px;
+        border-radius: 16px;
+        box-shadow: var(--shadow);
+        border: 1px solid var(--gray-200);
+        backdrop-filter: blur(10px);
+    }
+    
+    .header h1 {
+        font-size: 28px;
+        font-weight: 700;
+        color: var(--gray-900);
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+    
+    .header h1 i {
+        color: var(--primary);
+        background: var(--primary-very-light);
+        padding: 12px;
+        border-radius: 12px;
+        font-size: 20px;
+    }
+    
+    .user-info {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        font-weight: 500;
+        color: var(--gray-700);
+        background: var(--gray-50);
+        padding: 12px 16px;
+        border-radius: 12px;
+        border: 1px solid var(--gray-200);
+    }
+    
+    .user-info i {
+        color: var(--primary);
+        font-size: 18px;
+    }
+    
+    .toggle-btn {
+        background: none;
+        border: none;
+        font-size: 24px;
+        cursor: pointer;
+        color: var(--gray-700);
+        display: none;
+        transition: var(--transition);
+        padding: 8px;
+        border-radius: 8px;
+    }
+    
+    .toggle-btn:hover {
+        color: var(--primary);
+        background: var(--gray-100);
+    }
+    
+    .container {
+        background: var(--white);
+        padding: 32px;
+        border-radius: 20px;
+        box-shadow: var(--shadow);
+        margin-bottom: 32px;
+        border: 1px solid var(--gray-200);
+        transition: var(--transition);
+    }
+    
+    .container:hover {
+        box-shadow: var(--shadow-hover);
+    }
+
+    /* Grid layout for uploads - smaller cards */
+    .uploads-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); /* smaller min width */
+        gap: 16px; /* tighter gap */
+        margin-bottom: 32px;
+    }
+
+    /* Individual upload cards */
+    .upload-card {
+        background: var(--white);
+        border-radius: 12px;
+        padding: 16px; /* reduced padding */
+        box-shadow: var(--shadow);
+        border: 1px solid var(--gray-200);
+        transition: var(--transition);
+        position: relative;
+        overflow: hidden;
+    }
+
+    .upload-card:hover {
+        transform: translateY(-4px);
+        box-shadow: var(--shadow-hover);
+        border-color: var(--primary-light);
+    }
+
+    .upload-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 4px;
+        background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+    }
+
+    .card-image {
+        width: 100%;
+        height: 140px; /* smaller image */
+        border-radius: 12px;
+        object-fit: cover;
+        margin-bottom: 12px;
+        border: 2px solid var(--gray-200);
+        transition: var(--transition);
+    }
+
+    .card-image:hover {
+        transform: scale(1.02);
+        border-color: var(--primary);
+    }
+
+    .card-content {
+        display: flex;
+        flex-direction: column;
+        gap: 8px; /* reduced gap */
+    }
+
+    .card-user {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        font-weight: 600;
+        color: var(--gray-800);
+        font-size: 14px; /* smaller font */
+    }
+
+    .card-user i {
+        color: var(--primary);
+        background: var(--primary-very-light);
+        padding: 6px;
+        border-radius: 8px;
+        font-size: 12px;
+    }
+
+    .card-date {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        color: var(--gray-600);
+        font-size: 12px; /* smaller font */
+        font-weight: 500;
+    }
+
+    .card-date i {
+        color: var(--gray-500);
+    }
+
+    .card-status {
+        display: flex;
+        justify-content: flex-end;
+    }
+
+    .badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        padding: 6px 12px; /* smaller badge */
+        border-radius: 16px;
+        font-size: 10px; /* smaller text */
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .bg-success {
+        background: linear-gradient(135deg, var(--success) 0%, var(--success-dark) 100%);
+        color: var(--white);
+        box-shadow: 0 2px 4px rgba(16, 185, 129, 0.3);
+    }
+
+    .empty-state {
+        text-align: center;
+        padding: 60px 20px;
+        color: var(--gray-500);
+        background: var(--gray-50);
+        border-radius: 16px;
+        border: 2px dashed var(--gray-300);
+    }
+
+    .empty-state i {
+        font-size: 64px;
+        color: var(--gray-300);
+        margin-bottom: 24px;
+        display: block;
+    }
+
+    .empty-state h3 {
+        font-size: 20px;
+        font-weight: 600;
+        margin-bottom: 8px;
+        color: var(--gray-700);
+    }
+
+    .empty-state p {
+        font-size: 16px;
+        color: var(--gray-500);
+    }
+
+    /* Pagination */
+    .pagination {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        margin-top: 32px;
+        flex-wrap: wrap;
+        gap: 8px;
+    }
+
+    .pagination-item {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-width: 44px;
+        height: 44px;
+        padding: 0 16px;
+        border-radius: 12px;
+        background: var(--white);
+        color: var(--gray-700);
+        text-decoration: none;
+        font-weight: 600;
+        transition: var(--transition);
+        border: 2px solid var(--gray-200);
+        cursor: pointer;
+        font-size: 14px;
+    }
+
+    .pagination-item:hover {
+        background: var(--primary);
+        color: var(--white);
+        border-color: var(--primary);
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+    }
+
+    .pagination-item.active {
+        background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+        color: var(--white);
+        border-color: var(--primary);
+        box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
+    }
+
+    .pagination-item.disabled {
+        opacity: 0.4;
+        cursor: not-allowed;
+        pointer-events: none;
+    }
+
+    .page-info {
+        margin-top: 16px;
+        text-align: center;
+        color: var(--gray-600);
+        font-size: 15px;
+        font-weight: 500;
+        background: var(--gray-50);
+        padding: 12px 24px;
+        border-radius: 12px;
+        border: 1px solid var(--gray-200);
+    }
+
+    .pagination-info {
+        margin-top: 8px;
+        text-align: center;
+        color: var(--gray-500);
+        font-size: 13px;
+    }
+    .close-btn {
+    display: none; /* hidden by default */
+    background: none;
+    border: none;
+    font-size: 28px;
+    color: var(--white);
+    cursor: pointer;
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    z-index: 1001;
+}
+
+    /* Responsive Styles */
+    @media (max-width: 992px) {
+        .sidebar {
+            width: 250px;
+        }
+        
+        .main-content {
+            padding: 24px;
+        }
+
+        .uploads-grid {
+            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+            gap: 12px;
+        }
+
+        .upload-card {
+            padding: 12px;
+        }
+
+        .card-image {
+            height: 120px;
+        }
+    }
+
+    @media (max-width: 768px) {
+        .dashboard {
+            flex-direction: column;
+        }
+        
+        .sidebar {
+            width: 100%;
+            position: fixed;
+            top: 0;
+            left: -100%;
+            z-index: 999;
+            height: 100vh;
+        }
+        
+        .sidebar.active {
+            left: 0;
+        }
+        
+        .main-content {
+            margin-left: 0;
+            width: 100%;
+            padding: 16px;
+        }
+        
+        .toggle-btn {
+            display: block;
+        }
+
+        .header {
+            padding: 20px;
+            border-radius: 12px;
+        }
+
+        .header h1 {
+            font-size: 22px;
+        }
+
+        .container {
+            padding: 20px;
+            border-radius: 16px;
+        }
+
+        .uploads-grid {
+            grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+            gap: 10px;
+        }
+
+        .upload-card {
+            padding: 10px;
+        }
+
+        .card-image {
+            height: 100px;
+        }
+
+        .pagination {
+            gap: 4px;
+        }
+
+        .pagination-item {
+            min-width: 36px;
+            height: 36px;
+            font-size: 12px;
+        }
+        .close-btn {
+        display: block;
+    }
+    }
+
+    @media (max-width: 480px) {
+        .header {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 16px;
+        }
+
+        .user-info {
+            align-self: flex-end;
+        }
+
+        .upload-card {
+            padding: 8px;
+        }
+
+        .card-image {
+            height: 80px;
+        }
+
+        .pagination-item {
+            min-width: 32px;
+            height: 32px;
+            font-size: 11px;
+        }
+    }
+</style>
+
+</head>
+<body>
+    <div class="dashboard">
+        <!-- Sidebar - UNCHANGED -->
+        <div class="sidebar" id="sidebar">
+
+            <button class="close-btn" id="close-sidebar">
+    &times;
+</button>
+
+            <div class="sidebar-header">
+                <h2>Bird Admin</h2>
+                <p>Manage your bird database</p>
+            </div>
+
+            <ul class="nav-menu">
+                <li class="nav-item">
+                    <a href="{% url 'admin_dashboard' %}" class="nav-link">
+                        <i class="fas fa-home"></i> Home
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="{% url 'birds_list' %}" class="nav-link">
+                        <i class="fas fa-feather-alt"></i> Birds List
+                    </a>
+                </li>
+
+                {% if request.user.role|lower == "admin" %}
+                <li class="nav-item">
+                    <a href="{% url 'user_uploads' %}" class="nav-link active">
+                        <i class="fas fa-edit"></i> User Detection History
+                    </a>
+                </li>
+                {% endif %}
+                <li class="nav-item">
+                    <a href="{% url 'reports' %}" class="nav-link">
+                        <i class="fas fa-chart-bar"></i> Reports
+                    </a>
+                </li>
+                
+                <li class="nav-item">
+                    <a href="{% url 'logout' %}" class="nav-link" id="logout-link">
+                        <i class="fas fa-sign-out-alt"></i> Logout
+                    </a>
+                </li>
+            </ul>
+        </div>
+
+        <!-- Main Content - REDESIGNED -->
+        <div class="main-content">
+            <div class="header">
+                <button class="toggle-btn" id="toggle-sidebar">
+                    <i class="fas fa-bars"></i>
+                </button>
+                <h1><i class="fas fa-upload"></i> User Uploads</h1>
+                <div class="user-info">
+                    <i class="fas fa-user-circle"></i>
+                    <span>Welcome, Admin</span>
+                </div>
+            </div>
+
+            <!-- User Uploads Section -->
+            <div class="container">
+                <!--  Replaced table with card-based grid layout -->
+                <div class="uploads-grid">
+                    {% for photo in photos %}
+                    <div class="upload-card table-row">
+                        <img src="{{ photo.photo.url }}" alt="Bird Photo" class="card-image">
+                        <div class="card-content">
+                            <div class="card-user">
+                                <i class="fas fa-user"></i>
+                                {{ photo.user.username }}
+                            </div>
+                            <div class="card-date">
+                                <i class="far fa-calendar-alt"></i>
+                                {{ photo.uploaded_at|date:"F d, Y H:i" }}
+                            </div>
+                            <div class="card-status">
+                                <span class="badge bg-success">
+                                    <i class="fas fa-check"></i> Approved
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                    {% empty %}
+                    <div class="empty-state" style="grid-column: 1 / -1;">
+                        <i class="fas fa-inbox"></i>
+                        <h3>No uploads yet</h3>
+                        <p>User uploads will appear here once they start submitting photos.</p>
+                    </div>
+                    {% endfor %}
+                </div>
+                
+                <!-- Pagination -->
+                <div class="flex justify-between items-center mt-6">
+                    <ul class="pagination flex space-x-3 text-base font-medium">
+                        <!-- Prev Button -->
+                        <li class="prev text-gray-400 cursor-not-allowed">
+                            <a href="#" class="pagination-item disabled">
+                                <i class="fas fa-chevron-left"></i> Prev
+                            </a>
+                        </li>
+
+                        <!-- Page links will be generated here -->
+                        
+                        <!-- Next Button -->
+                        <li class="next text-gray-700">
+                            <a href="#" class="pagination-item">
+                                Next <i class="fas fa-chevron-right"></i>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+
+                <!-- Page Info -->
+                <div class="page-info">
+                    Showing <span id="startItem">0</span> to <span id="endItem">0</span> of 
+                    <span id="totalItems">0</span> entries
+                </div>
+
+                <!-- Secondary Info -->
+                <div class="pagination-info">
+                    Showing 1 to 5 of 10 entries
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- JavaScript - UNCHANGED -->
+    <script>
+
+        const closeBtn = document.getElementById("close-sidebar");
+if (closeBtn) {
+    closeBtn.addEventListener("click", function() {
+        sidebar.classList.remove("active");
+    });
+}
+
+        // Toggle sidebar on mobile
+        const toggleBtn = document.getElementById("toggle-sidebar");
+        const sidebar = document.getElementById("sidebar");
+        
+        if (toggleBtn) {
+            toggleBtn.addEventListener("click", function() {
+                sidebar.classList.toggle("active");
+            });
+        }
+        
+        // Close sidebar when clicking outside on mobile
+        document.addEventListener("click", function(event) {
+            if (window.innerWidth <= 768 && 
+                !sidebar.contains(event.target) && 
+                !toggleBtn.contains(event.target) && 
+                sidebar.classList.contains("active")) {
+                sidebar.classList.remove("active");
+            }
+        });
+        
+        // Pagination functionality
+        document.addEventListener("DOMContentLoaded", function () {
+            const rows = document.querySelectorAll(".table-row");
+            const paginationUl = document.querySelector(".pagination");
+            const prevBtn = paginationUl.querySelector(".prev");
+            const nextBtn = paginationUl.querySelector(".next");
+            const pageInfo = document.querySelector(".page-info");
+
+            const itemsPerPage = 14;
+            const totalItems = rows.length;
+            const totalPages = Math.ceil(totalItems / itemsPerPage);
+            let currentPage = 1;
+
+            function renderPaginationLinks() {
+                paginationUl.querySelectorAll("li:not(.prev):not(.next)").forEach(el => el.remove());
+
+                for (let i = 1; i <= totalPages; i++) {
+                    const li = document.createElement("li");
+                    const a = document.createElement("a");
+                    a.href = "#";
+                    a.dataset.page = i;
+                    a.textContent = i;
+                    a.className = "pagination-item";
+
+                    if (i === currentPage) {
+                        a.classList.add("active");
+                    }
+
+                    li.appendChild(a);
+                    paginationUl.insertBefore(li, nextBtn);
+                }
+            }
+
+            function showPage(pageNum) {
+                const start = (pageNum - 1) * itemsPerPage;
+                const end = start + itemsPerPage;
+
+                rows.forEach((row, i) => {
+                    row.style.display = i >= start && i < end ? "" : "none";
+                });
+
+                document.getElementById("startItem").textContent = totalItems ? start + 1 : 0;
+                document.getElementById("endItem").textContent = totalItems ? Math.min(end, totalItems) : 0;
+                document.getElementById("totalItems").textContent = totalItems;
+
+                currentPage = pageNum;
+                renderPaginationLinks();
+
+                prevBtn.classList.toggle("text-gray-400", currentPage === 1);
+                prevBtn.classList.toggle("cursor-not-allowed", currentPage === 1);
+                nextBtn.classList.toggle("text-gray-400", currentPage === totalPages);
+                nextBtn.classList.toggle("cursor-not-allowed", currentPage === totalPages);
+            }
+
+            paginationUl.addEventListener("click", function (e) {
+                const target = e.target;
+                if (target.tagName !== "A") return;
+                e.preventDefault();
+
+                const page = parseInt(target.dataset.page);
+
+                if (target.closest("li").classList.contains("prev") && currentPage > 1) {
+                    showPage(currentPage - 1);
+                } else if (target.closest("li").classList.contains("next") && currentPage < totalPages) {
+                    showPage(currentPage + 1);
+                } else if (page) {
+                    showPage(page);
+                }
+            });
+
+            // Initialize
+            if (totalItems > 0) {
+                showPage(1);
+            } else {
+                pageInfo.textContent = "No entries to display";
+            }
+        });
+    </script>
+</body>
+</html>
