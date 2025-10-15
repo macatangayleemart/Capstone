@@ -9,7 +9,6 @@ from django.core.files.base import ContentFile
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
 import numpy as np
-import tensorflow as tf
 from django.views.decorators.csrf import csrf_exempt
 from PIL import Image
 import io
@@ -300,6 +299,8 @@ print("File exists?", os.path.exists(MODEL_PATH))
 
 @csrf_exempt
 def predict_bird(request):
+    import tensorflow as tf
+    
     if request.method == "POST":
         frame_file = request.FILES.get("frame")
         if not frame_file:
