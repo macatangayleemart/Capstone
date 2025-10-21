@@ -28,6 +28,11 @@ DEBUG = True
 
 ALLOWED_HOSTS = ['birdwatch.capstoneph.com', '.up.railway.app']
 
+CSRF_TRUSTED_ORIGINS = [
+    'https://birdwatchcapstone.up.railway.app',
+]
+
+
 
 # Application definition
 
