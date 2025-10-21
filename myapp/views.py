@@ -301,10 +301,10 @@ def get_yolo_model():
 
 @csrf_exempt
 def predict_bird(request):
-    # ✅ Import TensorFlow only when needed (not at startup)
     import tensorflow as tf
     import numpy as np
-    import cv2
+    from PIL import Image
+    import io
     from django.core.files.base import ContentFile
     import uuid
 
@@ -313,10 +313,10 @@ def predict_bird(request):
         if not frame_file:
             return JsonResponse({"error": "No frame received"}, status=400)
 
-        # Convert uploaded frame to OpenCV format
+        # Convert uploaded frame to NumPy array using Pillow (no cv2)
         frame = frame_file.read()
-        nparr = np.frombuffer(frame, np.uint8)
-        img = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
+        img = Image.open(io.BytesIO(frame)).convert("RGB")
+        img = np.array(img)
 
         # ✅ Get the cached YOLO model
         model = get_yolo_model()
@@ -359,6 +359,7 @@ def predict_bird(request):
         return JsonResponse({"birds": birds_data})
 
     return JsonResponse({"error": "Invalid request"}, status=400)
+
 
 @csrf_exempt
 def get_last_detection(request):
