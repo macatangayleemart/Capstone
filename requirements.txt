@@ -79,6 +79,7 @@ rich==13.9.4
 scikit-learn==1.6.1
 scipy==1.15.2
 seaborn==0.13.2
+django-sendgrid-v5
 simsimd==6.2.1
 six==1.17.0
 split-folders==0.5.1
@@ -114,6 +115,7 @@ whitenoise==6.7.0
 widgetsnbextension==4.0.13
 wrapt==1.17.2
 xlsxwriter==3.2.5
+
 
 
 
