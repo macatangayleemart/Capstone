@@ -1,0 +1,17 @@
+{
+  "build": {
+    "builder": "python",
+    "packages": [
+      "libgl1",
+      "libglib2.0-0",
+      "ffmpeg",
+      "gcc",
+      "libsm6",
+      "libxext6"
+    ],
+    "pythonVersion": "3.11.9"
+  },
+  "deploy": {
+    "command": "python manage.py migrate && gunicorn myCapstone.wsgi:application --bind 0.0.0.0:8000"
+  }
+}
