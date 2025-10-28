@@ -4,8 +4,8 @@ nixPkgs = [
     "gcc",
     "glib",
     "libGL",
-    "libX11",
-    "libXext"
+    "xorg.libX11",
+    "xorg.libXext"
 ]
 
 
