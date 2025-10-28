@@ -24,11 +24,11 @@ RUN pip install --no-cache-dir -r requirements.txt
 # Copy all project files
 COPY . .
 
-# Collect static files (ignore if not using)
+# Collect static files
 RUN python manage.py collectstatic --noinput || true
 
-# Expose port for Railway
-EXPOSE 8000
+# EXPOSE is optional; Railway injects the port automatically
+# EXPOSE 8000  <-- REMOVE or comment out
 
-# Run migrations and start server
-CMD python manage.py migrate && gunicorn myCapstone.wsgi:application --bind 0.0.0.0:8000
+# Run migrations and start server using runtime PORT
+CMD sh -c "python manage.py migrate && gunicorn myCapstone.wsgi:application --bind 0.0.0.0:$PORT"
