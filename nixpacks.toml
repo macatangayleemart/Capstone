@@ -14,20 +14,20 @@ nixPkgs = [
 
 [phases.install]
 cmds = [
-    # Make sure Python and pip are in the PATH
+    # Make sure PATH is correct
     "export PATH=$(dirname $(which python3.11)):$PATH",
 
-    # Verify pip exists
-    "which pip3.11 || echo 'pip not found, trying to link manually...'",
+    # Confirm pip is present
+    "which pip3.11 || echo 'pip not found — linking manually...'",
 
-    # Link pip globally if needed
-    "ln -sf $(dirname $(which python3.11))/pip3.11 /usr/local/bin/pip || true",
+    # Link pip globally
+    "ln -sf $(which pip3.11) /usr/local/bin/pip || true",
 
-    # Upgrade pip/setuptools/wheel
-    "python3.11 -m pip install --upgrade pip setuptools wheel",
+    # Use pip directly instead of 'python -m pip'
+    "pip install --upgrade pip setuptools wheel",
 
     # Install project dependencies
-    "python3.11 -m pip install -r requirements.txt"
+    "pip install -r requirements.txt"
 ]
 
 [phases.build]
