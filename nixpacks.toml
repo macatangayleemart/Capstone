@@ -9,16 +9,19 @@ nixPkgs = [
     "xorg.libXext"
 ]
 
-
 [phases.install]
 cmds = [
-    "pip install --upgrade pip",
-    "pip install -r requirements.txt"
+    "export PATH=$(dirname $(which python3.11)):$PATH",
+    "ln -sf $(which python3.11) /usr/local/bin/python || true",
+    "ln -sf $(dirname $(which python3.11))/pip3.11 /usr/local/bin/pip || true",
+    "python3.11 -m ensurepip --upgrade || true",
+    "python3.11 -m pip install --upgrade pip",
+    "python3.11 -m pip install -r requirements.txt"
 ]
 
 [phases.build]
 cmds = [
-    "python manage.py collectstatic --noinput || true"
+    "python3.11 manage.py collectstatic --noinput || true"
 ]
 
 [start]
