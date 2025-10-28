@@ -1,18 +1,24 @@
 [phases.setup]
 nixPkgs = [
-  "python311",
-  "gcc",
-  "ffmpeg",
-  "libsm",
-  "libxext",
-  "libgl1",
-  "libglib2.0-0"
+    "python311",
+    "ffmpeg",
+    "gcc",
+    "libGL",
+    "glib",
+    "libSM",
+    "libXext"
 ]
 
 [phases.install]
-cmds = ["pip install -r requirements.txt"]
+cmds = [
+    "pip install --upgrade pip",
+    "pip install -r requirements.txt"
+]
+
+[phases.build]
+cmds = [
+    "python manage.py collectstatic --noinput || true"
+]
 
 [start]
 cmd = "gunicorn myCapstone.wsgi:application"
-
-#ss
