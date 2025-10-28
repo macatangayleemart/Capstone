@@ -1,4 +1,16 @@
 [phases.setup]
-nixPkgs = ["libGL", "glib", "libglib", "libopencv", "libglvnd"]
+nixPkgs = [
+  "python311",
+  "gcc",
+  "ffmpeg",
+  "libsm",
+  "libxext",
+  "libgl1",
+  "libglib2.0-0"
+]
 
-#222
+[phases.install]
+cmds = ["pip install -r requirements.txt"]
+
+[start]
+cmd = "gunicorn myCapstone.wsgi:application"
