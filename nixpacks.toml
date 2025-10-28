@@ -1,8 +1,6 @@
 [phases.setup]
 nixPkgs = [
     "python311Full",
-    "python311Packages.pip",
-    "python311Packages.setuptools",
     "ffmpeg",
     "gcc",
     "glib",
@@ -13,10 +11,14 @@ nixPkgs = [
 
 [phases.install]
 cmds = [
+    # Make sure Python is on PATH
     "export PATH=$(dirname $(which python3.11)):$PATH",
-    "ln -sf $(which python3.11) /usr/local/bin/python || true",
-    "ln -sf $(dirname $(which python3.11))/pip3.11 /usr/local/bin/pip || true",
-    "python3.11 -m pip install --upgrade pip",
+
+    # Bootstrap pip manually if it's missing
+    "python3.11 -m ensurepip --upgrade || true",
+    "python3.11 -m pip install --upgrade pip setuptools wheel || true",
+
+    # Install dependencies
     "python3.11 -m pip install -r requirements.txt"
 ]
 
