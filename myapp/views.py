@@ -66,6 +66,8 @@ from functools import lru_cache
 
 
 
+
+
 def register_view(request):
     if request.method == "POST":
         form = RegisterForm(request.POST)
