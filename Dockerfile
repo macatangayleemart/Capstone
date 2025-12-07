@@ -31,4 +31,8 @@ RUN python manage.py collectstatic --noinput || true
 # EXPOSE 8000  <-- REMOVE or comment out
 
 # Run migrations and start server using runtime PORT
+<<<<<<< HEAD
 CMD sh -c "python manage.py migrate && gunicorn myCapstone.wsgi:application --bind 0.0.0.0:$PORT"
+=======
+CMD sh -c "python manage.py migrate && gunicorn myCapstone.wsgi:application --bind 0.0.0.0:$PORT"
+>>>>>>> 1059c81deb1b66b70c54bf771559d7a09fcd70c0

@@ -25,4 +25,8 @@ staticfiles/
 # Pip and build
 build/
 dist/
+<<<<<<< HEAD
 *.egg-info/
+=======
+*.egg-info/
+>>>>>>> 1059c81deb1b66b70c54bf771559d7a09fcd70c0

@@ -26,7 +26,11 @@ SECRET_KEY = 'django-insecure-tmfxch()806^wl9yk7lo(!o+5*5*@t2(j!u4c2frymkda+jd$w
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
+<<<<<<< HEAD
 ALLOWED_HOSTS = ['birdwatch.capstoneph.com', '.up.railway.app', 'localhost', '127.0.0.1', '10.39.97.244']
+=======
+ALLOWED_HOSTS = ['birdwatch.capstoneph.com', '.up.railway.app']
+>>>>>>> 1059c81deb1b66b70c54bf771559d7a09fcd70c0
 
 CSRF_TRUSTED_ORIGINS = [
     'https://birdwatchcapstone.up.railway.app',
@@ -154,4 +158,10 @@ EMAIL_BACKEND = "sendgrid_backend.SendgridBackend"
 SENDGRID_API_KEY = os.environ.get("SENDGRID_API_KEY")
 DEFAULT_FROM_EMAIL = os.environ.get("DEFAULT_FROM_EMAIL")
 SENDGRID_SANDBOX_MODE_IN_DEBUG = False
+<<<<<<< HEAD
 SENDGRID_ECHO_TO_STDOUT = True
+=======
+SENDGRID_ECHO_TO_STDOUT = True
+
+
+>>>>>>> 1059c81deb1b66b70c54bf771559d7a09fcd70c0
