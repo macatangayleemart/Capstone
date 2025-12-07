@@ -1,0 +1,136 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Import Poppins Font for Modern Look */
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;800&display=swap');
+
+        /* Background Image */
+        body {
+            background: url("{% static 'images/background.jpg' %}") no-repeat center center fixed;
+            background-size: cover;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        /* Glassmorphism Effect */
+        .glass-container {
+            background: rgba(255, 255, 255, 0.6); /* More opacity for contrast */
+            backdrop-filter: blur(5px);
+            padding: 2.5rem;
+            border-radius: 15px;
+            box-shadow: 0 10px 35px rgba(0, 0, 0, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.4);
+            text-align: center;
+        }
+
+        /* Headings & Labels */
+        h2 {
+            font-size: 2.5rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            color: #000; /* Black font */
+        }
+
+        p, label {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: #000; /* Black font */
+        }
+
+        /* Input Fields */
+        .input-field {
+            width: 100%;
+            padding: 14px;
+            margin-top: 10px;
+            font-size: 1.2rem;
+            font-weight: 600;
+            border: 1px solid rgba(0, 0, 0, 0.3);
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.8); /* Lighter field for contrast */
+            color: #000;
+        }
+
+        .input-field::placeholder {
+            color: rgba(0, 0, 0, 0.6);
+        }
+
+        /* Button Styling */
+        .login-btn {
+            width: 100%;
+            padding: 14px;
+            margin-top: 20px;
+            font-size: 1.4rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            background: linear-gradient(45deg, #4A90E2, #9013FE);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: transform 0.2s, opacity 0.3s;
+            box-shadow: 0px 5px 15px rgba(0, 0, 0, 0.3);
+        }
+
+        .login-btn:hover {
+            transform: scale(1.05);
+            opacity: 0.9;
+        }
+
+        /* Link Styling */
+        .link {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: #000; /* Black font */
+            text-decoration: none;
+        }
+
+        .link:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body class="flex items-center justify-center min-h-screen text-black">
+
+    <div class="w-full max-w-md glass-container">
+        <h2>Welcome Back</h2>
+
+        {% if messages %}
+    <div class="mt-4">
+        {% for message in messages %}
+            <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative text-sm" role="alert">
+                {{ message }}
+            </div>
+        {% endfor %}
+    </div>
+{% endif %}
+
+        <p class="mt-2">Log in to continue</p>
+
+        <form method="post" class="mt-6">
+            {% csrf_token %}
+            <div>
+                <label>Email</label>
+                <input type="text" name="email" placeholder="Enter your username" required class="input-field">
+            </div>
+            <div class="mt-4">
+                <label>Password</label>
+                <input type="password" name="password" placeholder="Enter your password" required class="input-field">
+            </div>
+            <div class="mt-4 text-right">
+                <a href="#" class="link">Forgot password?</a>
+            </div>
+            <button type="submit" class="login-btn">Login</button>
+        </form>
+
+        <p class="mt-6">
+            Don't have an account? <a href="{% url 'register' %}" class="link">Register</a>
+        </p>
+    </div>
+
+</body>
+</html>

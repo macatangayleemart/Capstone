@@ -1,0 +1,882 @@
+<!DOCTYPE
+html >
+  <html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Birds List - Bird Admin Dashboard</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #4CAF50;
+            --primary-dark: #45a049;
+            --secondary: #333;
+            --light-bg: #f4f4f4;
+            --white: #ffffff;
+            --shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+            --border-radius: 8px;
+            --danger: #f44336;
+            --danger-dark: #d32f2f;
+            --warning: #ff9800;
+            --warning-dark: #f57c00;
+            --success: #4CAF50;
+            --success-dark: #388E3C;
+            --info: #2196F3;
+            --info-dark: #1976D2;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: var(--light-bg);
+        }
+        
+        .dashboard {
+            display: flex;
+            min-height: 100vh;
+        }
+        
+        /* Sidebar Styles */
+        .sidebar {
+            width: 250px;
+            background-color: var(--secondary);
+            color: var(--white);
+            padding: 20px 0;
+            transition: all 0.3s ease;
+            overflow-y: auto;
+            box-shadow: 2px 0 5px rgba(0,0,0,0.1);
+        }
+        
+        .sidebar-header {
+            padding: 0 20px 20px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            text-align: center;
+        }
+        
+        .sidebar-header h2 {
+            color: var(--white);
+            margin-bottom: 10px;
+            font-weight: 600;
+        }
+        
+        .nav-menu {
+            list-style: none;
+            padding: 20px;
+        }
+        
+        .nav-item {
+            margin-bottom: 15px;
+        }
+        
+        .nav-link {
+            color: var(--white);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            padding: 10px;
+            border-radius: var(--border-radius);
+            transition: all 0.3s;
+            cursor: pointer;
+        }
+        
+        .nav-link:hover, .nav-link.active {
+            background-color: rgba(255, 255, 255, 0.1);
+            transform: translateX(5px);
+        }
+        
+        .nav-link i {
+            margin-right: 10px;
+            width: 20px;
+            text-align: center;
+        }
+        
+        .dropdown {
+            margin-top: 5px;
+        }
+        
+        .dropdown select {
+            width: 100%;
+            padding: 8px;
+            border-radius: var(--border-radius);
+            border: 1px solid #ddd;
+            background-color: var(--white);
+            margin-top: 5px;
+            cursor: pointer;
+        }
+        
+        /* Main Content Styles */
+        .main-content {
+            flex: 1;
+            padding: 20px;
+            transition: all 0.3s ease;
+        }
+        
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            background-color: var(--white);
+            padding: 15px 20px;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+        }
+        
+        .toggle-btn {
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: var(--secondary);
+            display: none;
+        }
+        
+        .container {
+            background: var(--white);
+            padding: 20px;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            margin-bottom: 20px;
+            transition: transform 0.3s;
+        }
+        
+        .container:hover {
+            transform: translateY(-5px);
+        }
+        
+        h1, h2 {
+            color: var(--secondary);
+            margin-bottom: 15px;
+        }
+        
+        button {
+            background-color: var(--primary);
+            color: var(--white);
+            padding: 10px 20px;
+            margin: 10px 0;
+            border: none;
+            border-radius: var(--border-radius);
+            cursor: pointer;
+            font-size: 16px;
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        button:hover {
+            background-color: var(--primary-dark);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        button i {
+            margin-right: 8px;
+        }
+
+        .btn-secondary {
+            background-color: var(--secondary);
+            color: var(--white);
+            text-decoration: none;
+            padding: 10px 20px;
+            border-radius: var(--border-radius);
+            display: inline-flex;
+            align-items: center;
+            transition: all 0.3s;
+        }
+
+        .btn-secondary:hover {
+            background-color: #444;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+
+        .btn-secondary i {
+            margin-right: 8px;
+        }
+
+        /* Search Bar */
+        .search-bar {
+            margin-bottom: 20px;
+            display: flex;
+            gap: 10px;
+        }
+
+        .search-bar input {
+            flex: 1;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: var(--border-radius);
+            font-size: 16px;
+        }
+
+        .search-bar button {
+            margin: 0;
+        }
+
+        /* Birds Table */
+        #birds-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+            background-color: var(--white);
+            border-radius: var(--border-radius);
+            overflow: hidden;
+            box-shadow: var(--shadow);
+        }
+
+        #birds-table th {
+            background-color: var(--primary);
+            color: var(--white);
+            padding: 12px 15px;
+            text-align: left;
+            font-weight: 600;
+        }
+
+        #birds-table td {
+            padding: 12px 15px;
+            border-bottom: 1px solid #ddd;
+        }
+
+        #birds-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        #birds-table tr:hover {
+            background-color: #f9f9f9;
+        }
+
+        /* Pagination */
+        .pagination {
+            display: flex;
+            justify-content: center;
+            margin-top: 20px;
+            gap: 5px;
+        }
+
+        .pagination button {
+            margin: 0;
+            padding: 8px 12px;
+            background-color: var(--white);
+            color: var(--secondary);
+            border: 1px solid #ddd;
+        }
+
+        .pagination button.active {
+            background-color: var(--primary);
+            color: var(--white);
+            border-color: var(--primary);
+        }
+
+        /* Loading Spinner */
+        .loader {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(255, 255, 255, 0.7);
+            z-index: 9999;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 5px solid #f3f3f3;
+            border-top: 5px solid var(--primary);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .close-btn {
+    display: none; /* hidden by default */
+    background: none;
+    border: none;
+    font-size: 28px;
+    color: var(--white);
+    cursor: pointer;
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    z-index: 1001;
+}
+
+        /* Responsive Styles */
+        @media (max-width: 768px) {
+            .dashboard {
+                flex-direction: column;
+            }
+            
+            .sidebar {
+                width: 100%;
+                position: fixed;
+                top: 0;
+                left: -100%;
+                z-index: 999;
+                height: 100vh;
+            }
+            
+            .sidebar.active {
+                left: 0;
+            }
+            
+            .main-content {
+                margin-left: 0;
+                width: 100%;
+            }
+            
+            .toggle-btn {
+                display: block;
+            }
+            
+            #birds-table {
+                display: block;
+                overflow-x: auto;
+            }
+
+            .search-bar {
+                flex-direction: column;
+            }
+
+            .search-bar input {
+                width: 100%;
+            }
+            .close-btn {
+        display: block;
+    }
+        }
+       #edit-bird-modal {
+  display: none;
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: #ffffff;
+  padding: 30px;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  box-shadow: 0 5px 20px rgba(0, 0, 0, 0.2);
+  z-index: 10000;
+  width: 90%;
+  max-width: 500px;
+}
+
+
+#edit-bird-modal form label {
+  display: block;
+  margin-bottom: 15px;
+  font-weight: bold;
+}
+
+#edit-bird-modal input[type="text"],
+#edit-bird-modal input[type="number"],
+#edit-bird-modal textarea {
+  width: 100%;
+  padding: 8px 10px;
+  margin-top: 5px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  box-sizing: border-box;
+  font-size: 14px;
+}
+
+#edit-bird-modal textarea {
+  resize: vertical;
+  height: 80px;
+}
+
+#edit-bird-modal button {
+  padding: 8px 16px;
+  margin-top: 10px;
+  margin-right: 10px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: background 0.3s ease;
+}
+
+#edit-bird-modal button[type="submit"] {
+  background-color: #4CAF50;
+  color: white;
+}
+
+#edit-bird-modal button[type="submit"]:hover {
+  background-color: #45a049;
+}
+
+#edit-bird-modal button[type="button"] {
+  background-color: #ccc;
+  color: black;
+}
+
+#edit-bird-modal button[type="button"]:hover {
+  background-color: #bbb;
+}
+
+.birds-grid-wrapper {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    justify-content: flex-start;
+  }
+  .bird-card {
+    background-color: #fff;
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    display: flex;
+    flex-direction: column;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    width: 200px;
+    margin: 0;
+  }
+  .bird-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  }
+  .bird-image {
+    width: 100%;
+    height: 140px;
+    object-fit: cover;
+  }
+  .bird-details {
+    padding: 0.75rem;
+    text-align: center;
+  }
+  .bird-details h3 {
+    font-size: 1rem;
+    font-weight: bold;
+    color: #2c3e50;
+    margin-bottom: 0.4rem;
+  }
+  .bird-details p {
+    font-size: 0.75rem;
+    color: #7f8c8d;
+    margin: 0.2rem 0;
+  }
+  .bird-details button {
+    margin-top: 0.5rem;
+    padding: 0.4rem 0.75rem;
+    font-size: 0.75rem;
+    background-color: #27ae60;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background 0.2s;
+  }
+  .bird-details button:hover {
+    background-color: #219150;
+  }
+  #view-bird-modal img {
+    width: 100%;        /* Take full modal width */
+    height: auto;       /* Maintain aspect ratio */
+    max-height: 300px;  /* Optional: limit height */
+    object-fit: contain; /* Fit image inside container without cropping */
+    border-radius: 8px;
+    margin-bottom: 1rem;
+}
+
+
+    </style>
+</head>
+<body>
+    <!-- Loading Spinner -->
+    <div class="loader" id="loader">
+        <div class="spinner"></div>
+    </div>
+
+    <div class="dashboard">
+        <!-- Sidebar -->
+        <div class="sidebar" id="sidebar">
+
+            <button class="close-btn" id="close-sidebar">
+    &times;
+</button>
+
+            <div class="sidebar-header">
+                <h2>Bird Admin</h2>
+                <p>Manage your bird database</p>
+            </div>
+            <ul class="nav-menu">
+                <li class="nav-item">
+                    <a href="{% url 'admin_dashboard' %}" class="nav-link">
+                        <i class="fas fa-home"></i> Home
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="{% url 'birds_list' %}" class="nav-link active">
+                        <i class="fas fa-feather-alt"></i> Birds List
+                    </a>
+                </li>
+                {% if request.user.role|lower == "admin" %}
+                <li class="nav-item">
+                    <a href="{% url 'user_uploads' %}" class="nav-link">
+                        <i class="fas fa-edit"></i> User Detection History
+                    </a>
+                </li>
+            {% endif %}
+
+                <li class="nav-item">
+                <a href="{% url 'reports' %}" class="nav-link">
+                        <i class="fas fa-chart-bar"></i> Reports
+                    </a>
+                </li>
+                
+                <li class="nav-item">
+                    <a href="{% url 'logout' %}" class="nav-link" id="logout-link">
+                        <i class="fas fa-sign-out-alt"></i> Logout
+                    </a>
+                </li>
+            </ul>
+        </div>
+
+        <!-- Main Content -->
+        <!-- Main Content -->
+<div class="main-content">
+    <div class="header">
+        <button class="toggle-btn" id="toggle-sidebar">
+            <i class="fas fa-bars"></i>
+        </button>
+        <h1><i class="fas fa-feather-alt"></i> Birds List</h1>
+        <div class="user-info">
+            <span>Welcome, Admin</span>
+        </div>
+    </div>
+
+                  <div class="container">
+                <div class="search-bar">
+                    <input type="text" id="bird-search" placeholder="Search birds...">
+                    <button id="search-btn"><i class="fas fa-search"></i> Search</button>
+                </div>
+
+                <!-- Bird Product Cards Grid -->
+  <div class="birds-grid-wrapper" id="birds-grid"></div>
+
+                <div class="pagination" id="pagination"></div>
+
+                
+                </div>
+
+<!-- Bird Detail Modal -->
+<div id="view-bird-modal" style="display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: white; padding: 30px; border-radius: 8px; border: 1px solid #ccc; box-shadow: 0 5px 20px rgba(0, 0, 0, 0.2); z-index: 10000; width: 90%; max-width: 500px;">
+  <img id="view-bird-image" src="" alt="Bird Image">
+  <h2 class="text-xl font-bold mb-2" id="view-bird-name"></h2>
+  <p><strong>Scientific Name:</strong> <span id="view-bird-scientific-name"></span></p>
+  <p><strong>Description:</strong> <span id="view-bird-description"></span></p>
+  <p><strong>Population:</strong> <span id="view-bird-population"></span></p>
+  <div class="mt-4">
+    <button onclick="openEditBirdModal(viewingBird)" style="background-color: var(--warning); color: white;"><i class="fas fa-edit"></i> Edit</button>
+    <button onclick="closeViewBirdModal()" style="background-color: #ccc; color: black;">Close</button>
+  </div>
+</div>
+
+        <div class="pagination" id="pagination">
+            <!-- Pagination will be added here -->
+        </div>
+
+        <a href="{% url 'admin_dashboard' %}" class="btn-secondary">
+            <i class="fas fa-arrow-left"></i> Back to Dashboard
+        </a>
+    </div>
+</div>
+
+
+
+<div id="edit-bird-modal">
+
+    <form id="edit-bird-form">
+      <input type="hidden" id="edit-bird-id" name="id">
+      <label>Name: <input type="text" id="edit-bird-name" name="name" required></label><br><br>
+      <label>Scientific Name: <input type="text" id="edit-bird-scientific-name" name="scientific_name" required></label><br><br>
+      <label>Description: <textarea id="edit-bird-description" name="description" required></textarea></label><br><br>
+      <label>Population: <input type="number" id="edit-bird-population" name="population" required></label><br><br>
+      <label>Image URL: <input type="text" id="edit-bird-image" name="image"></label><br><br>
+      <button type="submit">Save Changes</button>
+      <button type="button" onclick="closeEditBirdModal()">Cancel</button>
+    </form>
+  </div>
+
+  <!-- overlay for modal -->
+<div id="modal-overlay" style="
+  display: none;
+  position: fixed;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  background: rgba(0,0,0,0.4);
+  z-index: 9999;">
+</div>
+
+</body>
+</html>
+
+
+<script>
+
+    const closeBtn = document.getElementById("close-sidebar");
+if (closeBtn) {
+    closeBtn.addEventListener("click", function() {
+        sidebar.classList.remove("active");
+    });
+}
+
+
+  let viewingBird = null;
+
+  function showBirdModal(bird) {
+    viewingBird = bird;
+    document.getElementById('view-bird-name').innerText = bird.name;
+    document.getElementById('view-bird-scientific-name').innerText = bird.scientific_name;
+    document.getElementById('view-bird-description').innerText = bird.description;
+    document.getElementById('view-bird-population').innerText = bird.population;
+
+    // Fix: Use fallback if bird.image is missing
+    let imageUrl = bird.image
+        ? bird.image
+        : bird.image_data
+            ? `data:image/jpeg;base64,${bird.image_data}`
+            : '/static/images/default-bird.png';
+    document.getElementById('view-bird-image').src = imageUrl;
+
+    document.getElementById('view-bird-modal').style.display = 'block';
+    document.getElementById('modal-overlay').style.display = 'block';
+}
+
+
+  function closeViewBirdModal() {
+    document.getElementById('view-bird-modal').style.display = 'none';
+    document.getElementById('modal-overlay').style.display = 'none';
+  }
+
+  function displayBirds() {
+  const birdsGrid = document.getElementById("birds-grid");
+  birdsGrid.innerHTML = "";
+
+  const startIndex = (currentPage - 1) * birdsPerPage;
+  const endIndex = Math.min(startIndex + birdsPerPage, allBirds.length);
+
+  if (allBirds.length === 0) {
+    birdsGrid.innerHTML = '<p class="text-center w-full">No birds found. Try a different search term.</p>';
+    return;
+  }
+
+  for (let i = startIndex; i < endIndex; i++) {
+    const bird = allBirds[i];
+    let imageUrl = bird.image
+      ? bird.image
+      : bird.image_data
+        ? `data:image/jpeg;base64,${bird.image_data}`
+        : '/static/images/default-bird.png';
+
+    const safeId = `bird_${i}`;
+    window[safeId] = bird;
+
+    let card = `
+      <div class="bird-card">
+        <img src="${imageUrl}" alt="${bird.name}" class="bird-image">
+        <div class="bird-details">
+          <h3>${bird.name}</h3>
+          <p><em>${bird.scientific_name}</em></p>
+          <p>Population: ${bird.population}</p>
+          <button onclick='showBirdModalFromId("${safeId}")'>View Details</button>
+        </div>
+      </div>
+    `;
+
+    birdsGrid.innerHTML += card;
+  }
+}
+
+// Helper function to safely show modal
+function showBirdModalFromId(id) {
+  const bird = window[id];
+  showBirdModal(bird);
+}
+
+    document.addEventListener('DOMContentLoaded', function() {
+        // Toggle sidebar on mobile
+        const toggleBtn = document.getElementById('toggle-sidebar');
+        const sidebar = document.getElementById('sidebar');
+
+        if (toggleBtn) {
+            toggleBtn.addEventListener('click', () => {
+                sidebar.classList.toggle('active');
+            });
+        }
+
+        // Fetch birds data
+        fetchBirds();
+
+        // Search functionality
+        const searchBtn = document.getElementById('search-btn');
+        const searchInput = document.getElementById('bird-search');
+
+        if (searchBtn && searchInput) {
+            searchBtn.addEventListener('click', () => {
+                const searchTerm = searchInput.value.trim().toLowerCase();
+                if (searchTerm) {
+                    fetchBirds(searchTerm);
+                } else {
+                    fetchBirds();
+                }
+            });
+
+            searchInput.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    const searchTerm = searchInput.value.trim().toLowerCase();
+                    if (searchTerm) {
+                        fetchBirds(searchTerm);
+                    } else {
+                        fetchBirds();
+                    }
+                }
+            });
+        }
+    });
+
+    // Variables for pagination
+    let currentPage = 1;
+    let totalPages = 1;
+    let birdsPerPage = 10;
+    let allBirds = [];
+
+    // Function to fetch birds data
+function fetchBirds(searchTerm = '') {
+    const loader = document.getElementById('loader');
+    loader.style.display = 'flex'; // Show loader
+
+    fetch('/api/birds/')
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            return response.json();
+        })
+        .then(data => {
+            allBirds = data.birds;
+            displayBirds();
+        })
+        .catch(error => {
+            console.error('Error fetching birds:', error);
+            alert('Error loading birds data. Please try again later.');
+        })
+        .finally(() => {
+            loader.style.display = 'none'; // ⬅️ Always hide loader after fetch (success or error)
+        });
+}
+
+
+      
+
+        document.querySelectorAll('.edit-btn').forEach(button => {
+            button.addEventListener('click', () => {
+                const bird = {
+                    id: button.getAttribute('data-id'),
+                    name: button.getAttribute('data-name'),
+                    scientific_name: button.getAttribute('data-scientific-name'),
+                    description: button.getAttribute('data-description'),
+                    population: button.getAttribute('data-population'),
+                    image: button.getAttribute('data-image')
+                };
+                openEditBirdModal(bird);
+            });
+        });
+
+        document.querySelectorAll('.view-btn').forEach(button => {
+            button.addEventListener('click', () => {
+                const birdId = button.getAttribute('data-id');
+                alert(`View bird with ID: ${birdId}`);
+            });
+        });
+    
+function openEditBirdModal(bird) {
+  document.getElementById('edit-bird-id').value = bird.id;
+  document.getElementById('edit-bird-name').value = bird.name;
+  document.getElementById('edit-bird-scientific-name').value = bird.scientific_name;
+  document.getElementById('edit-bird-description').value = bird.description;
+  document.getElementById('edit-bird-population').value = bird.population;
+  document.getElementById('edit-bird-image').value = bird.image || "";
+
+  document.getElementById('edit-bird-modal').style.display = 'block';
+  document.getElementById('modal-overlay').style.display = 'block';
+}
+// Close modal
+function closeEditBirdModal() {
+    document.getElementById('edit-bird-modal').style.display = 'none';
+    document.getElementById('modal-overlay').style.display = 'none';
+}
+
+// Submit updated bird via AJAX
+document.getElementById('edit-bird-form').addEventListener('submit', function (e) {
+    e.preventDefault();
+
+    const formData = new FormData(this);
+
+    fetch('/update-bird/', {
+        method: 'POST',
+        headers: {
+            'X-CSRFToken': getCSRFToken() // include CSRF token for Django
+        },
+        body: formData
+    })
+    .then(res => res.json())
+    .then(data => {
+        if (data.status === 'success') {
+            alert('Bird updated successfully!');
+            closeEditBirdModal();
+            fetchBirds(); // refresh bird list
+        } else {
+            alert('Update failed: ' + data.message);
+        }
+    })
+    .catch(err => {
+        alert('Error occurred while updating bird.');
+        console.error(err);
+    });
+});
+
+// CSRF helper function
+function getCSRFToken() {
+    const name = 'csrftoken';
+    const cookies = document.cookie.split(';');
+    for (let cookie of cookies) {
+        let c = cookie.trim();
+        if (c.startsWith(name + '=')) {
+            return c.substring(name.length + 1);
+        }
+    }
+    return '';
+}
+ function escapeHtml(text) {
+        return text
+            .replace(/&/g, "&amp;")
+            .replace(/"/g, "&quot;")
+            .replace(/'/g, "&#039;")
+            .replace(/</g, "&lt;")
+            .replace(/>/g, "&gt;");
+    }
+
+
+</script>
+
+</body>
+</html>
+
