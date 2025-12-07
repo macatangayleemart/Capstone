@@ -915,11 +915,5 @@ def delete_user(request, user_id):
         user.delete()
         messages.success(request, "User deleted successfully.")
         return redirect("users_list_view")  # Change this to your actual user list view name
-<<<<<<< HEAD
+
     return render(request, "confirm_delete.html", {"user": user})
-=======
-    return render(request, "confirm_delete.html", {"user": user})
-
-
-
->>>>>>> 1059c81deb1b66b70c54bf771559d7a09fcd70c0
