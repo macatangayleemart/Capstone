@@ -64,6 +64,8 @@ urlpatterns = [
     path("", user_list_view, name="users_list"),  # Ensure this matches your redirect
     path("delete_user/<int:user_id>/", delete_user, name="delete_user"),
     path('users/', user_list_view, name='user_list'),
+     path('manage/', views.manage_photos, name='manage_photos'),
+     path('photos/update/<int:photo_id>/', views.update_bird_photo, name='update_bird_photo'),
 ]
 
 

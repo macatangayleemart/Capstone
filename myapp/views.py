@@ -5,8 +5,11 @@ from .forms import RegisterForm
 from .models import CustomUser
 from django.http import JsonResponse
 import base64
+from django.core.files.base import ContentFile
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
+import numpy as np
+import tensorflow as tf
 from django.views.decorators.csrf import csrf_exempt
 from PIL import Image
 import io
@@ -52,7 +55,10 @@ from django.core.mail import send_mail
 from django.conf import settings
 from django.urls import reverse
 from django.http import StreamingHttpResponse
+import cv2
 import torch
+from ultralytics import YOLO
+import uuid
 from .models import Signatory
 from reportlab.platypus import Table, TableStyle
 from reportlab.lib import colors
@@ -62,9 +68,6 @@ from reportlab.lib.styles import getSampleStyleSheet
 from reportlab.lib import colors    
 from reportlab.platypus import Paragraph
 from reportlab.lib.styles import ParagraphStyle
-from functools import lru_cache
-
-
 
 
 
@@ -285,43 +288,27 @@ def client_bird_list(request):
 
 
 
-# Build the absolute path to your model
+# Build the absolute path
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 MODEL_PATH = os.path.join(BASE_DIR, "models", "best_waterbirds_model.pt")
 
-
-@lru_cache(maxsize=1)
-def get_yolo_model():
-    """Load YOLOv8 model only once (lazy-load + cache)."""
-    from ultralytics import YOLO
-    model = YOLO(MODEL_PATH)
-    print(model.names)
-    print("Loaded from:", MODEL_PATH)
-    print("File exists?", os.path.exists(MODEL_PATH))
-    return model
-
+# Load the YOLOv8 model once
+model = YOLO(MODEL_PATH)
+print(model.names)
+print("Loaded from:", MODEL_PATH)
+print("File exists?", os.path.exists(MODEL_PATH))
 
 @csrf_exempt
 def predict_bird(request):
-    import tensorflow as tf
-    import numpy as np
-    from PIL import Image
-    import io
-    from django.core.files.base import ContentFile
-    import uuid
-
     if request.method == "POST":
         frame_file = request.FILES.get("frame")
         if not frame_file:
             return JsonResponse({"error": "No frame received"}, status=400)
 
-        # Convert uploaded frame to NumPy array using Pillow (no cv2)
+        # Convert to OpenCV format
         frame = frame_file.read()
-        img = Image.open(io.BytesIO(frame)).convert("RGB")
-        img = np.array(img)
-
-        # ✅ Get the cached YOLO model
-        model = get_yolo_model()
+        nparr = np.frombuffer(frame, np.uint8)
+        img = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
 
         # Run YOLO detection
         results = model(img)
@@ -329,6 +316,19 @@ def predict_bird(request):
 
         birds_data = []
         if len(detections) > 0:
+            for det in detections:
+                cls_id = int(det.cls[0].item())
+                bird_class = model.names[cls_id]
+                conf = float(det.conf[0].item())
+                x1, y1, x2, y2 = det.xyxy[0].tolist()
+
+                try:
+                    bird_obj = Bird.objects.get(name=bird_class)
+                except Bird.DoesNotExist:
+                    bird_obj = None
+
+                # Save the uploaded frame into BirdPhoto
+                # Save uploaded frame for each detected bird
             filename = f"{uuid.uuid4()}.jpg"
             for det in detections:
                 cls_id = int(det.cls[0].item())
@@ -341,7 +341,7 @@ def predict_bird(request):
                 except Bird.DoesNotExist:
                     bird_obj = None
 
-                # Save detection result as BirdPhoto
+                # Each detection = one BirdPhoto entry
                 bird_photo = BirdPhoto.objects.create(
                     user=request.user,
                     bird=bird_obj,
@@ -357,6 +357,7 @@ def predict_bird(request):
                     "confidence": conf,
                     "bbox": [x1, y1, x2, y2]
                 })
+
 
         return JsonResponse({"birds": birds_data})
 
@@ -915,5 +916,39 @@ def delete_user(request, user_id):
         user.delete()
         messages.success(request, "User deleted successfully.")
         return redirect("users_list_view")  # Change this to your actual user list view name
-
     return render(request, "confirm_delete.html", {"user": user})
+
+def manage_photos(request):
+    photos = BirdPhoto.objects.all().order_by('-uploaded_at')
+    birds = Bird.objects.all()  # Fetch all birds for dropdowns
+
+    if request.method == "POST":
+        # Check if this is an update or delete
+        if 'bird_id' in request.POST and 'photo_id' in request.POST:
+            photo_id = request.POST.get('photo_id')
+            bird_id = request.POST.get('bird_id')
+            photo = get_object_or_404(BirdPhoto, id=photo_id)
+            photo.bird = get_object_or_404(Bird, id=bird_id)
+            photo.save()
+        elif 'delete_photo_id' in request.POST:
+            photo_id = request.POST.get('delete_photo_id')
+            photo = get_object_or_404(BirdPhoto, id=photo_id)
+            photo.photo.delete()
+            photo.delete()
+
+        return redirect('manage_photos')
+
+    return render(request, 'manage_photos.html', {'photos': photos, 'birds': birds})
+def update_bird_photo(request, photo_id):
+    photo = get_object_or_404(BirdPhoto, id=photo_id)
+    birds = Bird.objects.all()  # Fetch all birds for dropdown
+
+    if request.method == "POST":
+        bird_id = request.POST.get('bird_id')
+        selected_bird = get_object_or_404(Bird, id=bird_id)
+        photo.bird = selected_bird
+        photo.save()
+        return redirect('manage_photos')  # redirect to photo list after update
+
+    return render(request, 'update_bird_photo.html', {'photo': photo, 'birds': birds})
+

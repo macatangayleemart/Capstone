@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Manage Bird Photos</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .photo-grid { display: flex; flex-wrap: wrap; gap: 20px; }
+        .photo-card { border: 1px solid #ccc; padding: 10px; width: 220px; text-align: center; }
+        .photo-card img { width: 200px; height: auto; }
+        .delete-btn, .update-btn { 
+            margin-top: 5px; 
+            padding: 5px 10px; 
+            border: none; 
+            cursor: pointer; 
+            width: 100%;
+        }
+        .delete-btn { background-color: red; color: white; }
+        .delete-btn:hover { background-color: darkred; }
+        .update-btn { background-color: green; color: white; }
+        .update-btn:hover { background-color: darkgreen; }
+        select { margin-top: 5px; width: 100%; padding: 5px; }
+    </style>
+</head>
+<body>
+
+<h2>Manage Bird Photos</h2>
+
+{% if photos %}
+    <div class="photo-grid">
+        {% for photo in photos %}
+            <div class="photo-card">
+                <img src="{{ photo.photo.url }}" alt="Bird Photo">
+                
+                <p>
+                    {% if photo.bird %}
+                        {{ photo.bird.name }}
+                    {% else %}
+                        Unknown
+                    {% endif %}
+                </p>
+
+                <p>Uploaded: {{ photo.uploaded_at }}</p>
+
+                <!-- Inline Update Form -->
+                <form method="post">
+                    {% csrf_token %}
+                    <input type="hidden" name="photo_id" value="{{ photo.id }}">
+
+                    <select name="bird_id">
+                        {% for bird in birds %}
+                            <option value="{{ bird.id }}" {% if photo.bird and photo.bird.id == bird.id %}selected{% endif %}>
+                                {{ bird.name }}
+                            </option>
+                        {% endfor %}
+                    </select>
+
+                    <button type="submit" class="update-btn">Update Bird</button>
+                </form>
+
+                <!-- Delete Form -->
+                <form method="post" style="margin-top:5px;">
+                    {% csrf_token %}
+                    <input type="hidden" name="delete_photo_id" value="{{ photo.id }}">
+                    <button type="submit" class="delete-btn">Delete</button>
+                </form>
+            </div>
+        {% endfor %}
+    </div>
+{% else %}
+    <p>No photos available.</p>
+{% endif %}
+
+</body>
+</html>
